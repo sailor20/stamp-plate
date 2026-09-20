@@ -25,7 +25,7 @@
 ## 工作原理（一条提示词一次成型）
 
 整枚邮票——纸、齿孔、针脚框、**全部排版文字、邮戳**——由**一条完整提示词**直接生成，
-**零 Python**：纯提示词 + 参数预设（`themes/*.json`），`scripts/` 下脚本全部可选。
+**零 Python、零代码文件**：纯提示词 + 参数预设（`themes/*.json`），模板即全部逻辑。
 提示词按五段式拼装
 （模板见 `references/stage2_template.txt`，用法见 `references/prompts.md` 阶段 2）：
 
@@ -72,12 +72,8 @@
 stamp-plate/
 ├── SKILL.md                     # 完整技能定义：路由 / 工作流 / 五区版式规格 / 质量门 / 失败修正决策树
 ├── themes/                      # 主题库（9 套 JSON：8 类景色 + 中文面值版）
-├── scripts/                     # 可选工具箱（主产线零 Python，一个都不用）
-│   ├── fill_prompt.py           # 批量/怕手误时替代手工替换（模板 + JSON → 整条提示词）
-│   ├── compose_sources.py       # 多图预合成一张（横向 / 纵向 / 2×2）
-│   └── qc_stamp.py              # 可复现质检（质量门判据算法化）
 ├── references/
-│   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 无字源票 / 彩蛋）
+│   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 彩蛋）
 │   └── stage2_template.txt      # ★一次成型模板唯一真源（占位符版）
 └── demo/                        # 示范图（最终样式基准）
 ```
@@ -94,8 +90,8 @@ stamp-plate/
 
 ## 环境
 
-主产线零依赖零 Python：只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入
-单张参考图、1536×1024、n=1）。可选脚本工具箱：Python 3.10+，依赖 Pillow、numpy。
+零依赖零 Python：只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入
+单张参考图、1536×1024、n=1）。技能内无任何脚本与代码文件。
 
 ---
 
