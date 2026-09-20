@@ -9,7 +9,7 @@
 
 ```bash
 # 1) 组装整条提示词（零 Python）：模板唯一真源 references/stage2_template.txt
-#    + 主题参数预设 themes/*.json → 按替换表机械替换 11 个占位符
+#    + 主题参数预设 themes/*.json → 按替换表机械替换 13 个占位符
 #    （替换表与分段文本预设全文见 references/prompts.md 阶段 2）
 #    主题键：coastal / hilltown / avenue / meadow / snow / lake / desert /
 #            garden / coastal_cn（自定义景仿照 themes/*.json 写一个）
@@ -32,16 +32,18 @@
 1. **保真** — `KEEP THE ARTWORK pixel for pixel`：景物 / 布片 / 线头一个像素都不动
 2. **邮票纸** — 齿孔写成打孔物理过程（`punched clean through, each hole showing the
    grey tabletop through it`）+ 纸边宽度（上下 12% / 左右 9%）+ 微倾斜 + 软投影
-3. **材质图形** — laid 纸纤维 + 贴画缘一圈深色虚线跑针框 + 随景色变化的迷你彩蛋
+3. **材质图形** — laid 纸纤维 + 贴画缘一圈深色虚线跑针框（右下织入细微盖销波线）
+   + 底部雕刻装饰信息条 + 随景色变化的迷你彩蛋
 4. **★ 排版规格** — 五区版式逐区给出「字符串加引号 + 位置 + 限长 + 字号比例 + 方向」
+   （顶部 AIR MAIL/POST 铭文按画面内容二选一、序列编号每次随机）
 5. **禁止项** — `no overlapping or colliding text` 打头
 
 ### A/B 串角色（「禁止自造词」的客观判据）
 
 | 类 | 字段 | 规则 |
 |---|---|---|
-| **A 固定串** | `side_left / engraver / postmark_name / postmark_date / year` | 模板自带虚构专名视为已授权：原样用、不改写、日期间隔点一律连字符 |
-| **B 专名位** | `title / series / value / side_right / eggs` | 随景色重写，重写后加引号锁死 |
+| **A 固定串** | `side_left / engraver / postmark_name / postmark_date / year / inscription(二选一)` | 模板自带虚构专名视为已授权：原样用、不改写、日期间隔点一律连字符；序列编号 `No.` + 6 位随机数字，纯数字不参与判据 |
+| **B 专名位** | `title / series / values(随机取一，中文单位) / side_right / eggs` | 随景色重写，重写后加引号锁死 |
 
 提示词里每个字符串必须逐字来自 A∪B 的引号原串。
 
@@ -49,12 +51,14 @@
 
 | 区域 | 内容 | 位置与限长 |
 |---|---|---|
-| 顶部 | 标题 `THE BLUE BAY` | 顶纸边水平居中，宽字距 |
-| 底部 | `POSTA - COASTAL SERIES` + 面值 + `2026` | 同一行水平居中，面值放大约 1.4×，每次出票从主题 `values` 数组随机取一 |
+| 顶部 | 铭文 `AIR MAIL`/`POST` + 标题 `THE BLUE BAY` | 同一竖列居中：铭文在上（~1.4% 画幅高），按画面内容二选一 |
+| 底部 | `POSTA - COASTAL SERIES` + 面值 + `2026` | 同一行水平居中，面值放大约 1.4×，每次出票从主题 `values` 数组随机取一（单位分/元） |
+| 底部·下沿 | 雕刻装饰信息条 + 序列编号 `No. NNNNNN` | 底行正下方：细雕纹横条不带字 + 序列号居中，各层间距 ~1%，安静不抢眼 |
 | 左 | logo + `LANDSCAPE ISSUE - TEXTILE STUDY` | logo 占左上 1/4；文字限中部 50%，自下而上 |
 | 右·上段 | 署名 `ENGRAVED BY A. MOREL` | 仅右上 1/4 区 |
 | 右·中段 | `IMPRESSIONIST - POST-IMPRESSIONIST` | 仅中部 50% 区，**与上段间隔 ≥5% 画幅高** |
 | 右下 | 圆形邮戳（信销样） | 半透明，只压画面右下角，不碰任何文字 |
+| 边框 | 细微盖销波线 | 织入虚线针脚框右下段，极淡半透明、无文字，与边框融为一体 |
 
 ### 实测翻车点 → 提示词修法
 
@@ -71,7 +75,7 @@
 ```
 stamp-plate/
 ├── SKILL.md                     # 完整技能定义：路由 / 工作流 / 五区版式规格 / 质量门 / 失败修正决策树
-├── themes/                      # 主题库（9 套 JSON：8 类景色 + 中文面值版）
+├── themes/                      # 主题库（9 套 JSON：8 类景色 + CJK 侧串版；面值单位一律中文 分/元）
 ├── references/
 │   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 彩蛋）
 │   └── stage2_template.txt      # ★一次成型模板唯一真源（占位符版）

@@ -18,6 +18,11 @@ sheet filling most of the frame.
    against the {{ARTWORK_NOUN}} edge — one rectangle of small, slightly
    irregular dark running stitches, like basting threads. NO wide linen border
    band, NO corner ornaments, NO floral embroidery, NO added trim of any kind.
+   Woven into this frame along its lower-right side is ONE very faint,
+   semi-transparent wavy cancellation line — a thin pale wave following the
+   frame, like a trace of cancellation absorbed into the border itself. It
+   carries NO words, NO date and NO circles, stays lighter than the
+   stitches, and never touches any lettering.
 
 4. TYPOGRAPHY — FIVE SEPARATE ZONES. Every line of type sits inside its own
    zone; the zones never touch each other; NO two lines of text may overlap,
@@ -27,14 +32,26 @@ sheet filling most of the frame.
    old-style SERIF in capitals with generous letter-spacing for the title, and
    a small condensed sans-serif in small capitals for secondary lines.
 
-   · TOP ZONE — the top paper margin, full width, horizontally centred: the
-     title "{{TITLE}}", spaced serif capitals, cap-height about 3.5 percent
-     of the image height.
-   · BOTTOM ZONE — the bottom paper margin, ONE single horizontally centred
-     line with even gaps between the three items: the issuing line
-     "{{SERIES}}" (small sans capitals), then the value "{{VALUE}}"
-     (about 1.4 times larger than the issuing line), then the year "{{YEAR}}"
-     (small).
+   · TOP ZONE — the top paper margin, full width, TWO stacked centred lines
+     with a clear gap of at least 1.2 percent of the image height between
+     them: first the tiny inscription "{{INSCRIPTION}}" in spaced sans
+     capitals, cap-height about 1.4 percent of the image height; below it
+     the title "{{TITLE}}", spaced serif capitals, cap-height about 3.5
+     percent of the image height.
+   · BOTTOM ZONE — the bottom paper margin, a quiet centred stack of THREE
+     layers with clear gaps of about 1 percent of the image height between
+     them: first, ONE single horizontally centred line with even gaps
+     between its three items — the issuing line "{{SERIES}}" (small sans
+     capitals), the value "{{VALUE}}" (about 1.4 times larger than the
+     issuing line), and the year "{{YEAR}}" (small); below it a THIN
+     ENGRAVED ORNAMENT BAND — a delicate engraved guilloche / lathe-work
+     ribbon about 1.2 percent of the image height tall and about two
+     thirds of the image width wide, centred, drawn in the same single
+     ink, purely decorative and carrying NO text; below the band the tiny
+     serial number "No. {{SERIAL}}" in small figures, cap-height about
+     1.2 percent of the image height, centred. The band and the serial
+     must stay faint and quiet, never competing with the footline or the
+     artwork.
    · LEFT ZONE — the left paper margin: a tiny stitched X-shaped logo in the
      upper quarter; below it "{{SIDE_LEFT}}" reading bottom-to-top, vertically
      centred and limited to the middle half of the margin height, small sans
@@ -53,8 +70,9 @@ sheet filling most of the frame.
 {{POSTMARK_BLOCK}}
 
 7. AVOID: overlapping or colliding text; letters entering another zone, the
-   artwork or the perforations; invented words, misspellings, random numbers;
-   a second ink colour; drop shadows on text; glowing or embossed text; bold
-   heavy type; postal markings other than the stated postmark; grey smudge
-   dots instead of real perforation holes; changing, redrawing or restyling
-   the artwork; hard black shadows.
+   artwork or the perforations; invented words, misspellings, random numbers
+   other than the stated serial; a second ink colour; drop shadows on text;
+   glowing or embossed text; bold heavy type; postal markings other than the
+   stated postmark and the faint border wave; grey smudge dots instead of
+   real perforation holes; changing, redrawing or restyling the artwork;
+   hard black shadows.
