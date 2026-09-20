@@ -1,0 +1,20 @@
+{
+  "key": "avenue",
+  "name": "\u6797\u836b\u9053",
+  "title": "THE LINDEN AVENUE",
+  "series": "POSTA - AVENUE SERIES",
+  "year": "2026",
+  "value": "60\u00a2",
+  "side_left": "LANDSCAPE ISSUE - TEXTILE STUDY",
+  "side_right": "IMPRESSIONIST - POST-IMPRESSIONIST",
+  "engraver": "ENGRAVED BY A. MOREL",
+  "postmark_name": "LITO SILVA",
+  "postmark_date": "14 - IX - 2026",
+  "eggs": [
+    "a tiny mushroom among the fallen leaves",
+    "a small bird perched on a branch",
+    "a tiny swing hanging from a bough"
+  ],
+  "egg_note": "\u843d\u53f6\u91cc\u7684\u5c0f\u8611\u83c7 \u00b7 \u4e00\u53ea\u9e1f \u00b7 \u6811\u677d\u4e0a\u7684\u79cb\u5343",
+  "ink": [92, 80, 68]
+}

@@ -5,10 +5,27 @@
 
 ![stamp-plate demo](demo/param-perf060.jpg)
 
+## 快速开始（三步）
+
+```bash
+# 1) 编译整条提示词：模板唯一真源 references/stage2_template.txt + 主题 JSON
+python scripts/fill_prompt.py --theme coastal --out prompt.txt
+#    主题键：coastal / hilltown / avenue / meadow / snow / lake / desert /
+#            garden / coastal_cn（自定义景仿照 themes/*.json 写一个）
+#    --photo 照片输入 ｜ --no-postmark 新票 ｜ --strict 防叠字补强
+
+# 2) 喂给图生图模型：只喂这一张参考图、n=1、size 1536x1024
+#    （喂两张会稳定 upstream_error；多图先 compose_sources.py 拼成一张）
+
+# 3) 可复现质检：算法化质量门 + 导出 2× 字带人工核对拼写
+python scripts/qc_stamp.py stamp.png --bands bands/
+```
+
 ## 工作原理（一条提示词一次成型）
 
 整枚邮票——纸、齿孔、针脚框、**全部排版文字、邮戳**——由**一条完整提示词**直接生成，
-python 不参与主产线。提示词按五段式拼装（模板见 `references/prompts.md` 阶段 2）：
+python 只负责编译提示词与质检，不参与出图。提示词按五段式拼装
+（模板见 `references/stage2_template.txt`，用法见 `references/prompts.md` 阶段 2）：
 
 1. **保真** — `KEEP THE ARTWORK pixel for pixel`：景物 / 布片 / 线头一个像素都不动
 2. **邮票纸** — 齿孔写成打孔物理过程（`punched clean through, each hole showing the
@@ -16,6 +33,15 @@ python 不参与主产线。提示词按五段式拼装（模板见 `references/
 3. **材质图形** — laid 纸纤维 + 贴画缘一圈深色虚线跑针框 + 随景色变化的迷你彩蛋
 4. **★ 排版规格** — 五区版式逐区给出「字符串加引号 + 位置 + 限长 + 字号比例 + 方向」
 5. **禁止项** — `no overlapping or colliding text` 打头
+
+### A/B 串角色（「禁止自造词」的客观判据）
+
+| 类 | 字段 | 规则 |
+|---|---|---|
+| **A 固定串** | `side_left / engraver / postmark_name / postmark_date / year` | 模板自带虚构专名视为已授权：原样用、不改写、日期间隔点一律连字符 |
+| **B 专名位** | `title / series / value / side_right / eggs` | 随景色重写，重写后加引号锁死 |
+
+提示词里每个字符串必须逐字来自 A∪B 的引号原串。
 
 ### 五区版式（防叠字的核心）
 
@@ -67,10 +93,17 @@ python scripts/stamp_kit.py --src your-stamp.png --out matrix.png --sheet
 
 ```
 stamp-plate/
-├── SKILL.md               # 完整技能定义：路由 / 工作流 / 五区版式规格 / 质量门 / 翻车点修正表
-├── references/prompts.md  # 提示词模板库（★阶段2 一次成型主模板 / 基础 / 边框支线 / 无字源票 / 彩蛋）
-├── scripts/stamp_kit.py   # 可选本地精排（Pillow + numpy）
-└── demo/                  # 示范图
+├── SKILL.md                     # 完整技能定义：路由 / 工作流 / 五区版式规格 / 质量门 / 失败修正决策树
+├── themes/                      # 主题库（9 套 JSON：8 类景色 + 中文面值版）
+├── scripts/
+│   ├── fill_prompt.py           # ★主产线：stage2 模板 + 主题 JSON → 整条提示词
+│   ├── compose_sources.py       # 多图预合成一张（横向 / 纵向 / 2×2）
+│   ├── qc_stamp.py              # 一次成型成片的可复现质检（算法化质量门）
+│   └── stamp_kit.py             # 可选本地精排（Pillow + numpy）
+├── references/
+│   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 无字源票 / 彩蛋）
+│   └── stage2_template.txt      # ★一次成型模板唯一真源（占位符版）
+└── demo/                        # 示范图（最终样式基准）
 ```
 
 > 完整 examples（各版式成图、矩阵对比、细节放大）随 WorkBuddy 技能包分发，不在此仓库。
@@ -88,8 +121,8 @@ stamp-plate/
 ## 环境
 
 主产线只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入单张参考图、
-1536×1024、n=1）。可选本地精排：Windows + Python 3.10+，依赖 Pillow、numpy；
-邮票字体取自 Windows 系统字体链。
+1536×1024、n=1）。辅助脚本与可选本地精排：Python 3.10+，依赖 Pillow、numpy。
+本地精排字体缺失时**显式报错**并给出三平台安装指引（绝不静默降级成位图字体）。
 
 ---
 

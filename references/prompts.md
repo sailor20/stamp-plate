@@ -18,86 +18,45 @@
 一条提示词直接生成完整邮票：纸、齿孔、针脚框、全部排版文字、邮戳。
 调用 `image2 edit_image`：只喂用户这一张参考图、`n=1`、`size 1536x1024`。
 
-**使用前替换三处**：①引号内文字（换主题时全部重写并加引号）②彩蛋三条
-（3b 对照表）③邮戳（用户要新票就删第 6 段）。
+**模板唯一真源 = `references/stage2_template.txt`（占位符版）。不要手抄改写**
+——手抄改错一处就是自造词。用 `scripts/fill_prompt.py` 一键编译：
 
-```
-Turn the artwork in this image into ONE REALISTIC COLLECTOR POSTAGE STAMP
-lying flat on a warm grey tabletop, viewed from directly above, the stamp
-sheet filling most of the frame.
-
-1. KEEP THE ARTWORK — CRITICAL: do not move, redraw or restyle the landscape,
-   the cloth patches or the threads. Copy the artwork pixel for pixel into the
-   centre of the stamp. The stamp is only the paper and lettering around it.
-
-2. THE STAMP SHEET: warm ivory-cream laid paper, matte, slightly fibrous,
-   gently aged. Blank paper margins of about 12 percent of the image height at
-   TOP and BOTTOM and 9 percent at LEFT and RIGHT between the artwork and the
-   perforations. Around all four sides cut a row of PERFORATION HOLES — small,
-   round, evenly spaced, punched clean through the paper, each hole showing the
-   grey tabletop through it, with a tiny inner shadow and a faintly fuzzy
-   raised paper rim; a few holes slightly irregular or partially torn at the
-   corners. The stamp lies with a gentle 1.5-degree tilt and casts a soft
-   shadow on the tabletop.
-
-3. EDGE THE ARTWORK with a SIMPLE DASHED RUNNING-STITCH FRAME set directly
-   against the painting edge — one rectangle of small, slightly irregular dark
-   running stitches, like basting threads. NO wide linen border band, NO corner
-   ornaments, NO floral embroidery, NO added trim of any kind.
-
-4. TYPOGRAPHY — FIVE SEPARATE ZONES. Every line of type sits inside its own
-   zone; the zones never touch each other; NO two lines of text may overlap,
-   collide or enter another zone. All type is printed in ONE muted ink (soft
-   charcoal-sepia, around RGB 92,80,68), letterpress-flat and slightly uneven,
-   in the traditional dignified style of mid-century engraved stamps — a fine
-   old-style SERIF in capitals with generous letter-spacing for the title, and
-   a small condensed sans-serif in small capitals for secondary lines.
-
-   · TOP ZONE — the top paper margin, full width, horizontally centred: the
-     title "THE BLUE BAY", spaced serif capitals, cap-height about 3.5 percent
-     of the image height.
-   · BOTTOM ZONE — the bottom paper margin, ONE single horizontally centred
-     line with even gaps between the three items: the issuing line
-     "POSTA - COASTAL SERIES" (small sans capitals), then the value "60¢"
-     (about 1.4 times larger than the issuing line), then the year "2026"
-     (small).
-   · LEFT ZONE — the left paper margin: a tiny stitched X-shaped logo in the
-     upper quarter; below it "LANDSCAPE ISSUE - TEXTILE STUDY" reading
-     bottom-to-top, vertically centred and limited to the middle half of the
-     margin height, small sans capitals.
-   · RIGHT ZONE — the right paper margin, TWO separate sub-zones: in the upper
-     quarter only, the engraver signature "ENGRAVED BY A. MOREL" reading
-     top-to-bottom in a small hand-written script; in the middle half only,
-     "IMPRESSIONIST - POST-IMPRESSIONIST" reading top-to-bottom, small sans
-     capitals. A clear gap of at least 5 percent of the image height separates
-     the two; neither line reaches the other's zone, and neither touches the
-     artwork or the perforations.
-   · Keep all lettering small and quiet — printed into the stamp as part of
-     its design, never added afterwards.
-
-5. HIDDEN DETAILS: add ONLY three tiny hidden details worked in the same
-   fabric-and-thread technique as the artwork, each no bigger than two or
-   three stitches across: a tiny sailing boat on the open water; a small shell
-   hidden in the vegetation at lower right; three or four very faint tiny
-   footprints on the sandy patch at lower left. Genuinely tiny, discoverable
-   only on close inspection.
-
-6. POSTMARK: a round semi-transparent cancellation postmark at the lower
-   right, overlapping ONLY the artwork's lower-right corner and the paper just
-   below it — it must NOT touch any lettering. A fine circle, the name "LITO
-   COSTIERA" in small capitals, three wavy cancellation lines, and the date
-   "14 · IX · 2026".
-
-7. AVOID: overlapping or colliding text; letters entering another zone, the
-   artwork or the perforations; invented words, misspellings, random numbers;
-   a second ink colour; drop shadows on text; glowing or embossed text; bold
-   heavy type; postal markings other than the stated postmark; grey smudge
-   dots instead of real perforation holes; changing, redrawing or restyling
-   the artwork; hard black shadows.
+```bash
+python scripts/fill_prompt.py --theme coastal --out prompt.txt
+# 主题键（themes/*.json，覆盖 3b 全部 8 类景色）：
+#   coastal / hilltown / avenue / meadow / snow / lake / desert / garden
+#   coastal_cn = 中文面值版（"60分" + CJK 侧串）
+# 开关：
+#   --photo          源图是照片（非布艺作品）：保真段换 PRINTED PHOTOGRAPH 版
+#                    + 禁止布艺化（默认 cloth patches/embroidery 措辞会把
+#                    照片布艺化），彩蛋移到纸边不进画面
+#   --no-postmark    新票（无邮戳段）
+#   --strict         上一轮右侧两段竖排叠字时追加 STRICT 段
+#   --theme 路径.json 自定义景色（字段见下）
 ```
 
-**质检与修正**：放大四条文字带逐字核对拼写 + 五区间隔；翻车点补强见
-SKILL.md「决策清单 → 失败修正」。叠字补强示例（追加到原提示词末尾重试一轮）：
+**A/B 串角色表**（「禁止自造词」的客观判据——提示词里每个引号串必须
+逐字来自下表）：
+
+| 类 | 字段 | 规则 |
+|---|---|---|
+| **A 固定串** | `side_left` `engraver` `postmark_name` `postmark_date` `year` | 模板自带虚构专名（LITO 系列、`ENGRAVED BY A. MOREL`、`14 - IX - 2026`）**视为已授权**：随主题原样用，不随景色改写、不改动拼写；日期间隔点一律连字符 `-`（`·` 会变方框） |
+| **B 专名位** | `title` `series` `value` `side_right` `eggs`（3 条） | 随景色重写，换景只动这一类；重写后同样加引号锁死 |
+
+主题 JSON 字段 = `key / name / title / series / year / value / side_left /
+side_right / engraver / postmark_name / postmark_date / eggs / egg_note / ink`。
+自定义景色 = 仿照任一 JSON 只换 B 串，A 串不动。
+
+**多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先
+`python scripts/compose_sources.py 图1 图2 …` 拼成一张；风格参考写成文字
+写进提示词，不找第二张风格图。
+
+**质检与修正**：`python scripts/qc_stamp.py 成片.png --bands <目录>` 出可复现
+PASS/FAIL（尺寸 ±5% / 纸边上下 ≥10% 硬·左右 ≥8% / 五区占用 / 右侧两段间隔
+≥5%H / 居中 ≤2–3% / 齿孔行波动 ≥18 / 纸纹高频 std ≥6 / 齿孔带入侵 ≤2%）；
+`--bands` 导出 2× 字带供**拼写逐字人工核对**（拼写没有像素判据）。
+修正走 SKILL.md「失败修正决策树」：局部修复优先，重出后强制全量质检。
+叠字补强可用 `--strict`（等价于在提示词末尾追加）：
 
 ```
 STRICT: the right margin carries TWO separate lines — "ENGRAVED BY A. MOREL"
@@ -476,7 +435,11 @@ genuinely TINY and subtle, discoverable only on close inspection.
 
 ### 换主题：彩蛋对照表
 
-换景色时把上面三条替换掉，**主题与彩蛋要对应**：
+> 9 套内置主题的彩蛋已写进 `themes/*.json` 的 `eggs` 字段，
+> `fill_prompt.py --theme <键>` 自动带入——只有**自定义景色**才需要
+> 从下表挑选后写进自己的 JSON。
+
+换景色时把三条替换掉，**主题与彩蛋要对应**：
 
 | 景色 | 彩蛋建议 |
 |---|---|

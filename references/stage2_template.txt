@@ -1,0 +1,60 @@
+Turn the artwork in this image into ONE REALISTIC COLLECTOR POSTAGE STAMP
+lying flat on a warm grey tabletop, viewed from directly above, the stamp
+sheet filling most of the frame.
+
+{{FIDELITY_BLOCK}}
+
+2. THE STAMP SHEET: warm ivory-cream laid paper, matte, slightly fibrous,
+   gently aged. Blank paper margins of about 12 percent of the image height at
+   TOP and BOTTOM and 9 percent at LEFT and RIGHT between the artwork and the
+   perforations. Around all four sides cut a row of PERFORATION HOLES — small,
+   round, evenly spaced, punched clean through the paper, each hole showing the
+   grey tabletop through it, with a tiny inner shadow and a faintly fuzzy
+   raised paper rim; a few holes slightly irregular or partially torn at the
+   corners. The stamp lies with a gentle 1.5-degree tilt and casts a soft
+   shadow on the tabletop.
+
+3. EDGE THE ARTWORK with a SIMPLE DASHED RUNNING-STITCH FRAME set directly
+   against the {{ARTWORK_NOUN}} edge — one rectangle of small, slightly
+   irregular dark running stitches, like basting threads. NO wide linen border
+   band, NO corner ornaments, NO floral embroidery, NO added trim of any kind.
+
+4. TYPOGRAPHY — FIVE SEPARATE ZONES. Every line of type sits inside its own
+   zone; the zones never touch each other; NO two lines of text may overlap,
+   collide or enter another zone. All type is printed in ONE muted ink (soft
+   charcoal-sepia, around RGB 92,80,68), letterpress-flat and slightly uneven,
+   in the traditional dignified style of mid-century engraved stamps — a fine
+   old-style SERIF in capitals with generous letter-spacing for the title, and
+   a small condensed sans-serif in small capitals for secondary lines.
+
+   · TOP ZONE — the top paper margin, full width, horizontally centred: the
+     title "{{TITLE}}", spaced serif capitals, cap-height about 3.5 percent
+     of the image height.
+   · BOTTOM ZONE — the bottom paper margin, ONE single horizontally centred
+     line with even gaps between the three items: the issuing line
+     "{{SERIES}}" (small sans capitals), then the value "{{VALUE}}"
+     (about 1.4 times larger than the issuing line), then the year "{{YEAR}}"
+     (small).
+   · LEFT ZONE — the left paper margin: a tiny stitched X-shaped logo in the
+     upper quarter; below it "{{SIDE_LEFT}}" reading bottom-to-top, vertically
+     centred and limited to the middle half of the margin height, small sans
+     capitals.
+   · RIGHT ZONE — the right paper margin, TWO separate sub-zones: in the upper
+     quarter only, the engraver signature "{{ENGRAVER}}" reading top-to-bottom
+     in a small hand-written script; in the middle half only, "{{SIDE_RIGHT}}"
+     reading top-to-bottom, small sans capitals. A clear gap of at least 5
+     percent of the image height separates the two; neither line reaches the
+     other's zone, and neither touches the artwork or the perforations.
+   · Keep all lettering small and quiet — printed into the stamp as part of
+     its design, never added afterwards.
+
+{{EGG_BLOCK}}
+
+{{POSTMARK_BLOCK}}
+
+7. AVOID: overlapping or colliding text; letters entering another zone, the
+   artwork or the perforations; invented words, misspellings, random numbers;
+   a second ink colour; drop shadows on text; glowing or embossed text; bold
+   heavy type; postal markings other than the stated postmark; grey smudge
+   dots instead of real perforation holes; changing, redrawing or restyling
+   the artwork; hard black shadows.

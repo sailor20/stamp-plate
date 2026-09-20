@@ -1,0 +1,20 @@
+{
+  "key": "coastal_cn",
+  "name": "\u6d77\u5cb8\u00b7\u4e2d\u6587\u9762\u503c",
+  "title": "THE BLUE BAY",
+  "series": "POSTA - COASTAL SERIES",
+  "year": "2026",
+  "value": "60\u5206",
+  "side_left": "\u6d77\u5cb8\u7cfb\u5217 - \u7eba\u7ec7\u7814\u7a76",
+  "side_right": "\u5370\u8c61\u6d3e - \u540e\u5370\u8c61\u6d3e",
+  "engraver": "\u96d5\u523b A. MOREL",
+  "postmark_name": "LITO COSTIERA",
+  "postmark_date": "14 - IX - 2026",
+  "eggs": [
+    "a tiny sailing boat on the open water",
+    "a small shell hidden in the vegetation at lower right",
+    "three or four very faint tiny footprints on the sandy patch at lower left"
+  ],
+  "egg_note": "\u5fae\u5c0f\u5e06\u8239 \u00b7 \u8d1d\u58f3 \u00b7 \u6c99\u4e0a\u811a\u5370",
+  "ink": [92, 80, 68]
+}

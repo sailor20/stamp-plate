@@ -1,0 +1,20 @@
+{
+  "key": "hilltown",
+  "name": "\u5c71\u57ce / \u6751\u9547",
+  "title": "THE HILL TOWN",
+  "series": "POSTA - HILLTOP SERIES",
+  "year": "2026",
+  "value": "60\u00a2",
+  "side_left": "LANDSCAPE ISSUE - TEXTILE STUDY",
+  "side_right": "IMPRESSIONIST - POST-IMPRESSIONIST",
+  "engraver": "ENGRAVED BY A. MOREL",
+  "postmark_name": "LITO COLLINA",
+  "postmark_date": "14 - IX - 2026",
+  "eggs": [
+    "a tiny pennant flag on a rooftop",
+    "a warm point of light in one window",
+    "a small cat sitting on a stone step"
+  ],
+  "egg_note": "\u5c4b\u9876\u4e0a\u7684\u5c0f\u65d7 \u00b7 \u7a97\u91cc\u7684\u4e00\u70b9\u6696\u5149 \u00b7 \u4e00\u53ea\u5c0f\u732b",
+  "ink": [92, 80, 68]
+}

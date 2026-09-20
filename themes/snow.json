@@ -1,0 +1,20 @@
+{
+  "key": "snow",
+  "name": "\u96ea\u666f",
+  "title": "THE FIRST SNOW",
+  "series": "POSTA - WINTER SERIES",
+  "year": "2026",
+  "value": "60\u00a2",
+  "side_left": "LANDSCAPE ISSUE - TEXTILE STUDY",
+  "side_right": "IMPRESSIONIST - POST-IMPRESSIONIST",
+  "engraver": "ENGRAVED BY A. MOREL",
+  "postmark_name": "LITO GLACIES",
+  "postmark_date": "14 - IX - 2026",
+  "eggs": [
+    "a tiny snowman by the fence",
+    "a line of small animal footprints across the snow",
+    "a few icicles under one eave"
+  ],
+  "egg_note": "\u96ea\u4eba \u00b7 \u4e00\u884c\u52a8\u7269\u8db3\u8ff9 \u00b7 \u5c4b\u6a90\u51b0\u51cc",
+  "ink": [92, 80, 68]
+}
