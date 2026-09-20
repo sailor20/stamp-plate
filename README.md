@@ -88,11 +88,14 @@ stamp-plate/
 - 保真段必须放最前并写 `pixel for pixel`——排版段在后，模型会趁排版顺手重画画面
 - 微倾斜 + 软投影让齿边清晰度从 12.3 → 34.0
 
-## 环境
+## License
 
-零依赖零 Python：只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入
-单张参考图、1536×1024、n=1）。技能内无任何脚本与代码文件。
+**仅限个人、非商业使用**。不允许销售、收费生成、订阅服务、代做、咨询、培训、SaaS/API、公司或客户项目及其他商业化用途。任何商业使用均须事先获得 [sailor20](https://github.com/sailor20) 的明确书面许可。
 
----
+<div align="center">
 
-*This is a [WorkBuddy](https://www.workbuddy.cn) Skill — designed to be installed and driven by an LLM agent.*
+**贴上风景，寄出片刻。**
+
+AI-GENERATED POSTAGE STAMPS · 2026
+
+</div>
