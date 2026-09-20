@@ -4,7 +4,7 @@
 
 **模板索引**：**阶段 2 ★一次成型整票（主产线，默认走这条）** → 3b 主题彩蛋 →
 1 基础版式 → 1b 边缘收拾 + 纸纹 → 1c / 1c-2 刺绣边框支线（含遮罩收边）→
-1d 边框精化遮罩 → 1e 无字源票（供附录本地精排）。
+1d 边框精化遮罩。
 
 **每个出图 prompt 按五段式拼装**（对应 SKILL.md「决策清单 / Prompt 结构」）：
 ① 源图保真 ② 邮票方向（纸 / 齿孔 / 倾斜投影 / 纸边宽度）③ 材质 / 图形
@@ -144,7 +144,7 @@ between them and between every other pair of lines.
 > **可选脚本工具箱**（不装也能走完主产线）：
 > `fill_prompt.py` = 怕手误/批量出票时替代手工替换（与上表同一模板同一 JSON，
 > 逻辑同源不会漂移）；`compose_sources.py` = 多图拼合；`qc_stamp.py` =
-> 可复现质检；`stamp_kit.py` = 像素级本地精排。
+> 可复现质检。
 
 ---
 
@@ -414,41 +414,6 @@ AVOID: touching the artwork, the perforated edge, or any other margin.
    三代自动检测，全被齿孔暗点或浅色亚麻骗过。
 3. **遮罩验证**：受保护区（齿孔框 + 画面）与上一版逐像素 diff 应 ≈ 0
    （本例三次全 0.000），才算真保护。
-
----
-
-## 阶段 1e · 无字源票：虚线针脚框（供附录本地精排）
-
-出一张**纸面完全空白**的邮票底票（虚线针脚框 + 齿孔 + 纸边，无任何文字），
-专供 SKILL.md 附录的**可选本地精排**路线（`stamp_kit.py` 排版）。
-默认产线走阶段 2 一次成型，不必经过这一步。
-
-```
-Put the whole fabric-collage artwork onto a REAL POSTAGE STAMP viewed flat from
-directly above. Edge the artwork with a SIMPLE DASHED RUNNING-STITCH FRAME set
-DIRECTLY against the painting edge — a single rectangle of small, slightly
-irregular dark running stitches, like basting threads, following the rectangle
-of the artwork. There must be NO wide linen border band, NO corner ornaments,
-NO floral embroidery, NO added trim of any kind — only this one dashed stitch
-frame and then the bare paper.
-
-Leave generous CLEAN UNPRINTED MARGINS of bare warm ivory-cream laid paper
-between the stitch frame and the perforated edge — approximately 12 to 14
-percent of the total image height at TOP and BOTTOM, and approximately 9 to 10
-percent of the total image width at LEFT and RIGHT.
-
-(齿孔段、微倾斜 + 软投影段、「景物不动」段 —— 同阶段 1)
-
-The stamp paper must arrive COMPLETELY BLANK — no title, no words, no letters,
-no numbers, no typography anywhere on it; all type is added later in a separate
-typesetting step.
-
-AVOID: linen border band, corner ornaments, floral embroidery, typography,
-text, letters, numbers, postal markings, changing the artwork.
-```
-
-本地合成起步参数：`--margin-v 0.12 --margin-h 0.10`；画面已自带虚线框时，
-`--stitch` 轴只作叠针加强，不用追求档位间密度突变。
 
 ---
 

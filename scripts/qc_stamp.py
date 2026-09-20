@@ -29,8 +29,95 @@ import sys
 import numpy as np
 from PIL import Image, ImageFilter
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from stamp_kit import find_paper, find_paper_sheet     # noqa: E402
+def find_paper(im, thr=None, paper_bbox=None):
+    """返回**刺绣/内容区**的 bbox（左,上,右,下）。
+
+    paper_bbox 给定时先裁出纸面再找内容（把桌面/阴影挡在检测外），
+    返回坐标仍换算回整图坐标。
+
+    判据是「高频纹理能量」——空白纸几乎没有高频细节，而刺绣、亚麻布、油画都很强。
+    做法：沿 y / x 求平均高频剖面，**跳过两侧的齿孔峰**后找第一个显著升高处。
+
+    注意：返回值是「内容区」而不是「纸面」。纸面用 find_paper_sheet()。
+    （自 stamp_kit.py 移植——精排路线移除后 qc 自包含）
+    """
+    if paper_bbox is not None:
+        px0, py0, px1, py1 = paper_bbox
+        bx = find_paper(im.crop(paper_bbox))
+        return (bx[0] + px0, bx[1] + py0, bx[2] + px0, bx[3] + py0)
+    g = np.asarray(im.convert("L"), dtype=np.float32)
+    hi = np.abs(g - np.asarray(im.convert("L").filter(ImageFilter.GaussianBlur(6)),
+                               dtype=np.float32))
+    H, W = hi.shape
+
+    def edge(prof, reverse=False):
+        n = len(prof)
+        p = prof[::-1] if reverse else prof
+        # 跳过最外侧 2% —— 那里是齿孔（本身高频很高，会误导检测）
+        skip = max(3, int(n * 0.02))
+        inner = p[skip:]
+        if len(inner) < 8:
+            return 0
+        base = float(np.percentile(inner, 25))          # 纸边的基线
+        peak = float(np.percentile(inner, 88))          # 内容区的高位
+        if peak - base < 1.5:                           # 没有明显内容差异
+            return skip
+        t = base + (peak - base) * 0.45
+        for i, v in enumerate(inner):
+            if v > t:
+                return skip + i
+        return skip
+
+    yt = edge(hi.mean(1), False)
+    yb = H - 1 - edge(hi.mean(1), True)
+    xl = edge(hi.mean(0), False)
+    xr = W - 1 - edge(hi.mean(0), True)
+    if xr - xl < W * 0.2 or yb - yt < H * 0.2:
+        return (0, 0, W - 1, H - 1)
+    return (int(xl), int(yt), int(xr), int(yb))
+
+
+def find_paper_sheet(im, min_cover=0.35):
+    """估计**邮票纸**在画幅中的 bbox（含纸边与齿孔带的整张纸）。
+
+    邮票「浮在桌面上」且带 1.5° 倾斜——画布边 ≠ 纸边，从画布边取比例会排到
+    桌面或齿孔上。按「纸是亮且低饱和的大块区域，桌面更暗」切出行/列跨度。
+    返回 (x0,y0,x1,y1)；不可信时返回 None（调用方退回 margin 假设比例，
+    或由用户 --paper-frame 显式给框——可控 > 聪明）。
+    （自 stamp_kit.py 移植——精排路线移除后 qc 自包含）
+    """
+    a = np.asarray(im.convert("RGB"), dtype=np.float32)
+    lum = a @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
+    H, W = lum.shape
+    r = max(2, int(min(H, W) * 0.02))
+    ring = np.concatenate([lum[:r, :].ravel(), lum[-r:, :].ravel(),
+                           lum[:, :r].ravel(), lum[:, -r:].ravel()])
+    thr = float(np.median(ring)) + 10.0          # 桌面中位数 + 台阶
+    bright = lum > thr
+    colf, rowf = bright.mean(0), bright.mean(1)
+
+    def span(frac, t=0.45):
+        idx = np.where(frac > t)[0]
+        if len(idx) < 8:
+            return None
+        return int(idx[0]), int(idx[-1])
+
+    cs, rs = span(colf), span(rowf)
+    if not cs or not rs:
+        return None
+    x0, y0, x1, y1 = cs[0], rs[0], cs[1], rs[1]
+    if (x1 - x0) < W * min_cover or (y1 - y0) < H * min_cover:
+        return None
+    # 完整性只验**四条边带**——不能验整框覆盖率：画面内容本身比纸暗，
+    # 主体一大就会把整框覆盖率拉爆（合成图实测 0.5 → 误判失败）
+    bh, bw = y1 - y0, x1 - x0
+    bands = (bright[y0:y0 + int(bh * 0.22), x0:x1],
+             bright[y1 - int(bh * 0.22):y1, x0:x1],
+             bright[y0:y1, x0:x0 + int(bw * 0.22)],
+             bright[y0:y1, x1 - int(bw * 0.22):x1])
+    if float(np.mean([b.mean() for b in bands])) < 0.45:
+        return None
+    return (x0 + 2, y0 + 2, x1 - 2, y1 - 2)
 
 
 def ink_mask(a):

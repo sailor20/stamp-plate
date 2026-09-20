@@ -66,31 +66,6 @@
 | 齿孔画成灰团 | 重申 `punched clean through` + 孔透出桌面 |
 | 景物被顺手重画 | 保真段放最前 + `copy the artwork pixel for pixel` |
 
-## 可选：本地精排（python，默认不走）
-
-提示词路线反复失败、或需要像素级排版精度时：先按 `references/prompts.md` 阶段 1e
-出**无字**源票（纸面 COMPLETELY BLANK），再用 `scripts/stamp_kit.py` 本地排版：
-
-```bash
-python scripts/stamp_kit.py --src your-stamp.png --out final.png \
-    --margin-v 0.12 --margin-h 0.10
-
-# 五档矩阵预览
-python scripts/stamp_kit.py --src your-stamp.png --out matrix.png --sheet
-```
-
-四轴质感（本地精排的可调参数）：
-
-| 参数 | 0.0 | 1.0 |
-|---|---|---|
-| `--stitch` 针法密度 | 稀疏跳针 | 密实连续针脚（沿景物轮廓） |
-| `--age` 做旧 | 全新发行 | 泛黄 + 边缘压暗 + foxing 褐斑 |
-| `--perf` 齿孔完整度 | 残缺撕裂 | 完整规整（低值沿齿孔行啃出缺口） |
-| `--cancel` 邮戳 | 不加 | 角落半透明圆日戳 + 注销线 |
-
-五档预设：`全新发行 Mint` / `标准 Standard` / `信销票 Used` / `古董藏票 Antique` /
-`密绣精工 Dense`。
-
 ## 仓库结构
 
 ```
@@ -100,8 +75,7 @@ stamp-plate/
 ├── scripts/                     # 可选工具箱（主产线零 Python，一个都不用）
 │   ├── fill_prompt.py           # 批量/怕手误时替代手工替换（模板 + JSON → 整条提示词）
 │   ├── compose_sources.py       # 多图预合成一张（横向 / 纵向 / 2×2）
-│   ├── qc_stamp.py              # 可复现质检（质量门判据算法化）
-│   └── stamp_kit.py             # 可选本地精排（Pillow + numpy）
+│   └── qc_stamp.py              # 可复现质检（质量门判据算法化）
 ├── references/
 │   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 无字源票 / 彩蛋）
 │   └── stage2_template.txt      # ★一次成型模板唯一真源（占位符版）
@@ -117,14 +91,11 @@ stamp-plate/
 - **文字排版在提示词里完成**：五区版式 + 引号字符串 + 连字符隔点，可做到零叠字零错字
 - 保真段必须放最前并写 `pixel for pixel`——排版段在后，模型会趁排版顺手重画画面
 - 微倾斜 + 软投影让齿边清晰度从 12.3 → 34.0
-- 本地精排的位置用显式参数（`--margin-v/--margin-h`），**不要自动检测**——
-  四代检测算法全败于米色亚麻与齿孔干扰
 
 ## 环境
 
 主产线零依赖零 Python：只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入
 单张参考图、1536×1024、n=1）。可选脚本工具箱：Python 3.10+，依赖 Pillow、numpy。
-本地精排字体缺失时**显式报错**并给出三平台安装指引（绝不静默降级成位图字体）。
 
 ---
 
