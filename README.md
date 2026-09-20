@@ -3,7 +3,7 @@
 > **Turn a landscape photo / fabric-collage artwork into a realistic postage stamp — one image in, one stamp out.**
 > 把一张风景图（照片或布艺拼贴作品）做成一枚可以拿在手里的真实感邮票：**一图换一票**。
 
-![stamp-plate demo](demo/param-perf060.jpg)
+![stamp-plate demo](demo/classic-bay-v2.png)
 
 ## 快速开始（三步）
 
