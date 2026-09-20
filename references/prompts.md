@@ -41,20 +41,21 @@ eggs(3 条英文) / egg_note / ink`。
 
 | 占位符 | 替换为 | 说明 |
 |---|---|---|
-| `{{FIDELITY_BLOCK}}` | 保真段 F 或 P（预设全文见下） | 布艺输入用 F；照片输入用 P |
-| `{{ARTWORK_NOUN}}` | `painting` 或 `photograph` | 与保真段同侧：F→painting，P→photograph |
+| `{{FIDELITY_BLOCK}}` | 保真段 F / P / O（预设全文见下） | 布艺输入用 F；照片输入用 P；用户点名「油画化 / 莫奈 / 梵高」用 O |
+| `{{ARTWORK_NOUN}}` | `painting` 或 `photograph` | 与保真段同侧：F→painting，P→photograph，O→painting |
 | `{{EGG_BLOCK}}` | 彩蛋段三态之一（预设全文见下） | fabric / photo_margin / photo_clean |
 | `{{POSTMARK_BLOCK}}` | 邮戳段（预设全文见下） | 信销样=替换；新票=替换成空（第 6 段整段消失） |
 | `{{TITLE}}` `{{SERIES}}` `{{YEAR}}` | JSON 同名字段 | B 串，加引号锁死 |
 | `{{VALUE}}` | JSON `values` 数组**随机取一** | B 串，加引号锁死；**每次出票换一个**，不沿用上一次的票；单位一律中文（分 / 元） |
-| `{{INSCRIPTION}}` | `AIR MAIL` 或 `POST`（按画面内容二选一） | 模板自带词对视为已授权：天空开阔 / 飞机 / 飞鸟 / 风筝等飞行主题 → `AIR MAIL`，其余 → `POST` |
+| `{{INSCRIPTION}}` | `AIR MAIL` 或 `POST`（按画面内容二选一） | 模板自带词对视为已授权：**仅当飞行器是画面明确主体**（飞机 / 飞艇 / 热气球 / 滑翔机 / 风筝）或明确航空邮政语境 → `AIR MAIL`；**开阔天空、远景飞鸟不构成 AIR MAIL**，普通风景一律 → `POST` |
 | `{{SERIAL}}` | 6 位随机数字（每次出票换一个） | 纯数字串无自造词风险（模板里格式为 `No. {{SERIAL}}`） |
 | `{{SIDE_LEFT}}` `{{ENGRAVER}}` `{{SIDE_RIGHT}}` | JSON 同名字段 | A 串，不改写、不改拼写 |
 | `{{POSTMARK_NAME}}` `{{POSTMARK_DATE}}` | — | **模板正文没有这两个占位符**，只出现在邮戳段文本内部 |
 
 **模式开关的零 Python 等价操作**：照片输入 = P 保真段 + `photograph` +
 彩蛋段选 photo 态；新票 = 邮戳段替换成空；叠字补强 = 提示词末尾追加
-STRICT 段（预设全文见下）。
+STRICT 段（预设全文见下）；油画化 = O 保真段 + `painting`（egg 段措辞里
+photograph 同步改为 painted artwork）。
 **经典元素四件已写死在模板正文**（顶部铭文占位 `{{INSCRIPTION}}` /
 底部雕刻信息条 + 序列号 `{{SERIAL}}` / 边框右下盖销波线）——随替换自动
 带入，无需额外操作；盖销波线是版面固有设计，与可选的圆形邮戳互不影响。
@@ -77,6 +78,27 @@ STRICT 段（预设全文见下）。
    stamp: do NOT turn it into a fabric collage and do NOT add cloth patches,
    embroidery, stitches or threads inside it. Copy the image pixel for pixel.
    The stamp is only the paper and lettering around it.
+```
+
+**【保真段 O · 油画化主体】**（用户点名「油画化 / 莫奈 / 梵高」才用。
+两个要点：**必须点名谁负责哪块**——只写 fusing Monet and Van Gogh 两个
+标签并联，模型会把整张统一成中间态，既无莫奈的光也无梵高的力，正确写法
+= 同一支笔在不同对象上的不同笔势；**过渡句必写**——否则画面某个高度会
+出现两风硬接的分界）
+
+```
+1. THE ARTWORK — repaint the photograph as an OIL PAINTING in the fused style
+   of Monet and Van Gogh. Keep the composition, the horizon and every element
+   of the scene exactly where they are, but render the scene with oil paint on
+   canvas. One continuous painting in two hands: the SKY and the WATER are
+   MONET — short broken strokes of juxtaposed colour, optical mixing, soft
+   edges, airy light, quietly flowing; the CLOUDS, the HEADLAND and the
+   FOREGROUND vegetation are VAN GOGH — thick impasto swirls, strokes
+   following the form of what they paint, visible paint ridges with small
+   shadows, a few dark contour lines, gold against blue. The foreground
+   brushwork is the boldest and most sculpted; the water keeps finer broken
+   dabs. Transitions between the two hands are gradual — one continuous
+   painting, not two styles pasted together.
 ```
 
 **【彩蛋段 · 三态】**（`<e1> <e2> <e3>` = JSON `eggs` 三条，逐字填入）
