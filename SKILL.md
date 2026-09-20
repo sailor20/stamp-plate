@@ -1,14 +1,14 @@
 ---
 name: stamp-plate
-description: 把用户给的一张风景图（照片或布艺拼贴作品）用**一条完整提示词**直接生成一枚真实感邮票（一图换一票）——暖象牙打孔齿边纸、贴画缘虚线针脚框、三段式传统排版、四轴质感（针法 / 做旧 / 齿孔 / 邮戳）全部由提示词驱动。当用户提到邮票、纪念票、齿孔、postage stamp、首日封、信销票、邮戳，或说「做成邮票样式」「把底层换成邮票」「做一个收藏票」时使用。关键约束：文字按「五区版式规格」各居其位绝不重叠、画面景物像素级不动、一次只喂一张参考图；python 仅在用户要求精确控制时作可选精修。
-compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_prompt / compose_sources / qc_stamp 与可选精排 stamp_kit 需 Pillow + numpy。字体规则写在提示词里；本地精排字体缺失会显式报错（不静默降级）。
+description: 把用户给的一张风景图（照片或布艺拼贴作品）用**一条完整提示词**直接生成一枚真实感邮票（一图换一票）——暖象牙打孔齿边纸、贴画缘虚线针脚框、三段式传统排版、四轴质感（针法 / 做旧 / 齿孔 / 邮戳）全部由提示词驱动。当用户提到邮票、纪念票、齿孔、postage stamp、首日封、信销票、邮戳，或说「做成邮票样式」「把底层换成邮票」「做一个收藏票」时使用。关键约束：文字按「五区版式规格」各居其位绝不重叠、画面景物像素级不动、一次只喂一张参考图；主产线零 Python——纯提示词 + themes/*.json 参数预设，脚本全部为可选工具。
+compatibility: 主产线零依赖零 Python（只需 image2 MCP edit_image）；可选脚本 fill_prompt / compose_sources / qc_stamp / stamp_kit 需 Python 3.10+ 与 Pillow + numpy。字体规则写在提示词里；本地精排字体缺失会显式报错（不静默降级）。
 ---
 
 # 邮票画册（stamp-plate）
 
 **一句话定位**：把**一张**用户图变成**一枚**完整邮票——**纯提示词一次成型**：
-纸、齿孔、针脚框、全部排版文字、邮戳在一条提示词里生成；python 不参与主产线，
-仅当用户要求像素级精确时作可选精修。
+纸、齿孔、针脚框、全部排版文字、邮戳在一条提示词里生成；**整条工作流零
+Python**（纯提示词 + themes/*.json 参数预设），scripts/ 下四脚本全部为可选工具。
 
 ## ★ 最终样式基准（用户拍板，2026-09-20）
 
@@ -25,8 +25,9 @@ compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_pr
 
 ## 路由 / 模式
 
-- **默认模式：纯提示词一次成型**——一条完整提示词（prompts.md 阶段 2 主模板）
-  直接出整票，**不调 python**。
+- **默认模式：纯提示词 / 提示词 + 参数预设（零 Python）**——读
+  `references/stage2_template.txt` + `themes/*.json` 机械替换占位符组一条
+  完整提示词（prompts.md 阶段 2），直接出整票；不装任何脚本也能走完。
 - **特殊模式**：
   - 信销样：主模板第 6 段邮戳块（默认带上，用户要新票就删）
   - 刺绣宽边框支线：prompts.md 阶段 1c / 1c-2（用户点名才走）
@@ -46,27 +47,29 @@ compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_pr
 
 ## 工作流
 
-1. **读取输入**：一张源图。没有 → 问。**多张** → 先
-   `python scripts/compose_sources.py 图1 图2 …` 本地拼成一张
-   （横向/纵向/2×2，`--layout auto`；风格参考不喂图，写成文字）。
+1. **读取输入**：一张源图。没有 → 问。**多张** → 先拼成一张再喂
+   （贴图/画图软件手动拼合；可选脚本 `scripts/compose_sources.py`）。
    图上有水印/文字 → 先裁掉（inpaint 会留痕，不修）。
-2. **判断模式与主题**：默认海岸；换景从 `themes/*.json` 选键（8 类景色全覆盖，
-   见 prompts.md 3b 对照表；自定义景色仿照写一个 JSON）。
-3. **编译提示词**：`python scripts/fill_prompt.py --theme <键|JSON路径>
-   [--photo] [--no-postmark] [--strict] --out prompt.txt`——从
-   `references/stage2_template.txt`（**唯一真源**）+ 主题 JSON 生成整条
-   五段式提示词，引号字符串全部就位。**禁止手抄模板改写**（改错一处
-   就成了自造词）。
+2. **判断模式与主题**：默认海岸；换景从 `themes/*.json` 选一套参数预设
+   （8 类景色全覆盖，见 prompts.md 3b 对照表；自定义景色仿照写一个 JSON）。
+3. **组装提示词（零 Python）**：读 `references/stage2_template.txt`
+   （**唯一真源**）+ 主题 JSON，按 prompts.md 阶段 2「占位符替换表」
+   **机械替换** 11 个占位符（保真段 / 彩蛋段 / 邮戳段 / STRICT 段的
+   现成文本预设也在那一节，逐字照抄），替换后通读确认**无 `{{` 残留**。
+   **禁止手抄模板改写**（改错一处就成了自造词）。怕手误可用可选脚本
+   `fill_prompt.py`（与手工替换逻辑同源）。
 4. **生成**：`mcp__image2__edit_image`——只喂这一张参考图、`n=1`、
    `size 1536x1024`。524 等 120s 重试；下载 403 直接重试。
-5. **质检**：先跑可复现判据
-   `python scripts/qc_stamp.py 成片.png --bands <目录>`——尺寸 ±5% /
+5. **质检（目检为主）**：按「质量门」清单逐项目检——尺寸 ±5% /
    纸边上下 ≥10% 硬·左右 ≥8% / 五区占用 / 右侧两段间隔 ≥5%H / 居中 ≤2–3% /
-   齿孔行波动 ≥18 / 纸纹高频 std ≥6 / 齿孔带入侵 ≤2%。`--bands` 导出
-   2× 字带供**拼写逐字人工核对**（拼写没有像素判据，必须人眼过）。
+   齿孔行波动 / 纸纹 / 齿孔带入侵；**拼写放大 2× 逐字人工核对**
+   （拼写没有像素判据，必须人眼过）。有 Python 环境可用可选脚本
+   `scripts/qc_stamp.py 成片.png --bands <目录>` 出同一套判据的可复现
+   PASS/FAIL 并导出 2× 字带。
 6. **失败修正（决策树，局部修复优先）**：
-   - **只坏局部**（某段字错 / 邮戳歪 / 一处越界）→ 不整票重掷：加 `--strict`
-     补强重出，或转本地精排只补排版。重出 = 全图重掷，实测「修居中 →
+   - **只坏局部**（某段字错 / 邮戳歪 / 一处越界）→ 不整票重掷：在提示词
+     末尾**追加 STRICT 段现成文本**（prompts.md 阶段 2 预设）补强重出，
+     或转可选本地精排只补排版。重出 = 全图重掷，实测「修居中 →
      拼写从对变错」——翻车点会漂移。
    - **必须重出** → 先写明这次换掉**哪几个关键词**（其余不动），出图后
      **强制重跑全量质检**（含上次已过的项），不是只查上次失败项。
@@ -77,13 +80,15 @@ compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_pr
 
 - **图片角色**：输入图 = **画面内容源**，构图/笔触/布片就是成品的画面本体。
 - **单图限制（刻意取舍）**：image2 喂两张（内容 + 风格）稳定返回
-  `upstream_error`——**永远只喂一张**。多张素材 → `compose_sources.py`
-  预合成一张再喂；**风格参考一律写成文字**（`oil painting style` 等逐条
-  写进提示词），不找第二张风格图。
-- **照片输入分支**：源图是**照片**（非布艺作品）时，保真段必须换 `--photo`
-  版（`PRINTED PHOTOGRAPH` 措辞 + `do NOT turn it into a fabric collage`）——
-  默认模板里 `cloth patches / embroidery` 的措辞会诱导模型把照片布艺化；
-  彩蛋同步移到纸边、不进画面。
+  `upstream_error`——**永远只喂一张**。多张素材 → 先拼合成一张再喂
+  （手动拼合即可，可选脚本 `compose_sources.py`）；**风格参考一律写成
+  文字**（`oil painting style` 等逐条写进提示词），不找第二张风格图。
+- **照片输入分支**：源图是**照片**（非布艺作品）时，保真段必须换 P 版
+  （`PRINTED PHOTOGRAPH` 措辞 + `do NOT turn it into a fabric collage`）+
+  `{{ARTWORK_NOUN}}` 用 `photograph`——默认模板里 `cloth patches /
+  embroidery` 的措辞会诱导模型把照片布艺化；彩蛋同步选 photo 态
+  （移到纸边不进画面，或干脆 photo_clean 无彩蛋）。三段预设全文见
+  prompts.md 阶段 2。
 - **保留等级**：L0 景物像素级不动——`CRITICAL: do not move, redraw or restyle
   the landscape, the cloth patches or the threads`（一次成型更要用强措辞，
   否则模型趁排版顺手重画画面）；L1 结构保留——遮罩类支线作业时保护区
@@ -158,8 +163,9 @@ compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_pr
 - [ ] 纸边够宽（上下 10–13% / 左右 8–10%），文字未越界压画或压齿孔
 - [ ] 邮戳（若有）只压画面右下与纸面，未碰任何文字
 - [ ] 纸张有纤维感，微倾斜 + 软投影在
-- `qc_stamp.py` 判 FAIL → 按工作流「失败修正决策树」走：局部修复优先；
-  重出后**重跑全量质检**。两轮仍不过 → 转可选本地精排（附录）。
+- 质检 FAIL（目检任一项，或可选 `qc_stamp.py` FAIL）→ 按工作流
+  「失败修正决策树」走：局部修复优先；重出后**重跑全量质检**。
+  两轮仍不过 → 转可选本地精排（附录）。
 - 「齿孔带入侵·左/右」FAIL 且走的是精排路径 → 重跑加 `--perf-clear 0.042`
   （竖排外轨给齿孔让位；默认 perf_clear=0 时外轨距纸边仅 ~20px）。
 
@@ -179,9 +185,14 @@ compatibility: 主产线只需 image2 MCP（edit_image）；辅助脚本 fill_pr
 - 修正轮次：n（提示词补强点）
 ```
 
-## 附录 · 可选本地精排（默认不走）
+## 附录 · 可选脚本工具箱（主产线一个都不用）
 
-仅当提示词路线反复失败或用户要求像素级排版精度时使用：
+四个脚本全部是**可选工具**，一行定位：`fill_prompt.py` = 批量/怕手误时
+替代手工替换占位符；`compose_sources.py` = 多图拼合成一张；
+`qc_stamp.py` = 质量门判据的可复现 PASS/FAIL + 导出 2× 字带；
+`stamp_kit.py` = 像素级本地精排（下文）。
+
+仅当提示词路线反复失败或用户要求像素级排版精度时使用精排：
 先按 prompts.md **阶段 1e** 出**无字**源票（纸面 COMPLETELY BLANK），
 再跑 `scripts/stamp_kit.py` 本地排版（确定性、可复现）：
 
@@ -221,11 +232,11 @@ stamp-plate/
 ├── SKILL.md
 ├── themes/                   主题库（9 套 JSON = 3b 对照表 8 类景色 + 中文面值版）
 │   └── coastal.json … garden.json
-├── scripts/
-│   ├── fill_prompt.py        ★主产线：stage2 模板 + 主题 JSON → 整条提示词
+├── scripts/                  可选工具箱（主产线零 Python，一个都不用）
+│   ├── fill_prompt.py        批量/怕手误时替代手工替换（模板+JSON→整条提示词）
 │   ├── compose_sources.py    多图预合成一张（横向/纵向/2×2）
-│   ├── qc_stamp.py           一次成型成片的可复现质检（算法化质量门）
-│   └── stamp_kit.py          可选本地精排：四轴 + 主题排版（默认产线不用）
+│   ├── qc_stamp.py           可复现质检（质量门判据算法化）
+│   └── stamp_kit.py          可选本地精排：四轴 + 主题排版
 ├── references/
 │   ├── prompts.md            提示词模板库（★2 用法与判据 / 1 基础 / 1b /
 │   │                         1c·1c-2 刺绣边框支线 / 1d 边框精化 / 1e 无字源票 /

@@ -13,58 +13,138 @@
 
 ---
 
-## 阶段 2 · 一次成型整票（★主产线：纯提示词，不调 python）
+## 阶段 2 · 一次成型整票（★主产线：纯提示词 + 参数预设，零 Python）
 
 一条提示词直接生成完整邮票：纸、齿孔、针脚框、全部排版文字、邮戳。
 调用 `image2 edit_image`：只喂用户这一张参考图、`n=1`、`size 1536x1024`。
 
-**模板唯一真源 = `references/stage2_template.txt`（占位符版）。不要手抄改写**
-——手抄改错一处就是自造词。用 `scripts/fill_prompt.py` 一键编译：
+**两种等价主模式**：
+- **纯提示词**：agent 按五段式直接组一条完整提示词（快速出票）；
+- **提示词 + 参数预设**（默认推荐）：先选 `themes/*.json` 现成主题，
+  再对模板做**机械替换**——字符串零手误。
 
-```bash
-python scripts/fill_prompt.py --theme coastal --out prompt.txt
-# 主题键（themes/*.json，覆盖 3b 全部 8 类景色）：
-#   coastal / hilltown / avenue / meadow / snow / lake / desert / garden
-#   coastal_cn = 中文面值版（"60分" + CJK 侧串）
-# 开关：
-#   --photo          源图是照片（非布艺作品）：保真段换 PRINTED PHOTOGRAPH 版
-#                    + 禁止布艺化（默认 cloth patches/embroidery 措辞会把
-#                    照片布艺化），彩蛋移到纸边不进画面
-#   --no-postmark    新票（无邮戳段）
-#   --strict         上一轮右侧两段竖排叠字时追加 STRICT 段
-#   --theme 路径.json 自定义景色（字段见下）
+**模板唯一真源 = `references/stage2_template.txt`（占位符版）。不要手抄改写**
+——手抄改错一处就是自造词。默认组装 = agent 读模板原文 + 主题 JSON，
+按下方替换表**机械替换** 11 个占位符，替换后通读一遍，**确认没有 `{{` 残留**。
+
+### 第 1 步 · 选主题参数预设
+
+`themes/*.json`（9 套，覆盖 3b 全部 8 类景色）：
+`coastal / hilltown / avenue / meadow / snow / lake / desert / garden`
++ `coastal_cn`（中文面值版 "60分" + CJK 侧串）。
+字段 = `key / name / title / series / year / value / side_left / side_right /
+engraver / postmark_name / postmark_date / eggs(3 条英文) / egg_note / ink`。
+自定义景色 = 仿照任一 JSON 只换 B 串，A 串不动；eggs 必须给足 3 条。
+
+### 第 2 步 · 占位符替换表
+
+| 占位符 | 替换为 | 说明 |
+|---|---|---|
+| `{{FIDELITY_BLOCK}}` | 保真段 F 或 P（预设全文见下） | 布艺输入用 F；照片输入用 P |
+| `{{ARTWORK_NOUN}}` | `painting` 或 `photograph` | 与保真段同侧：F→painting，P→photograph |
+| `{{EGG_BLOCK}}` | 彩蛋段三态之一（预设全文见下） | fabric / photo_margin / photo_clean |
+| `{{POSTMARK_BLOCK}}` | 邮戳段（预设全文见下） | 信销样=替换；新票=替换成空（第 6 段整段消失） |
+| `{{TITLE}}` `{{SERIES}}` `{{VALUE}}` `{{YEAR}}` | JSON 同名字段 | B 串，加引号锁死 |
+| `{{SIDE_LEFT}}` `{{ENGRAVER}}` `{{SIDE_RIGHT}}` | JSON 同名字段 | A 串，不改写、不改拼写 |
+| `{{POSTMARK_NAME}}` `{{POSTMARK_DATE}}` | — | **模板正文没有这两个占位符**，只出现在邮戳段文本内部 |
+
+**模式开关的零 Python 等价操作**：照片输入 = P 保真段 + `photograph` +
+彩蛋段选 photo 态；新票 = 邮戳段替换成空；叠字补强 = 提示词末尾追加
+STRICT 段（预设全文见下）。
+
+### 第 3 步 · 分段文本预设（逐字照抄，`<尖括号>` 处填 JSON 值）
+
+**【保真段 F · 布艺输入】**
+
+```
+1. KEEP THE ARTWORK — CRITICAL: do not move, redraw or restyle the landscape,
+   the cloth patches or the threads. Copy the artwork pixel for pixel into the
+   centre of the stamp. The stamp is only the paper and lettering around it.
 ```
 
-**A/B 串角色表**（「禁止自造词」的客观判据——提示词里每个引号串必须
-逐字来自下表）：
+**【保真段 P · 照片输入】**（默认措辞会把照片布艺化，照片必须换这段）
+
+```
+1. KEEP THE PHOTOGRAPH — CRITICAL: do not move, redraw, restyle or re-light
+   the photograph. It is a PRINTED PHOTOGRAPH mounted at the centre of the
+   stamp: do NOT turn it into a fabric collage and do NOT add cloth patches,
+   embroidery, stitches or threads inside it. Copy the image pixel for pixel.
+   The stamp is only the paper and lettering around it.
+```
+
+**【彩蛋段 · 三态】**（`<e1> <e2> <e3>` = JSON `eggs` 三条，逐字填入）
+
+fabric 态（布艺输入，画内同技法彩蛋）：
+
+```
+5. HIDDEN DETAILS: add ONLY three tiny hidden details worked in the same
+   fabric-and-thread technique as the artwork, each no bigger than two or
+   three stitches across: <e1>; <e2>; <e3>.
+   Genuinely tiny, discoverable only on close inspection.
+```
+
+photo_margin 态（照片输入但保留彩蛋，画在纸边下角、不碰照片）：
+
+```
+5. HIDDEN DETAILS: three tiny stitched motifs worked ON THE BLANK PAPER
+   margin at the lower corners — never on the photograph itself: <e1>; <e2>;
+   <e3>. Each no bigger than two or three stitches across.
+```
+
+photo_clean 态（照片输入、无彩蛋）：
+
+```
+5. NO HIDDEN DETAILS: keep the photograph itself completely clean — no
+   added motifs, stitches or objects on the image area.
+```
+
+**【邮戳段】**（新票整段不要）
+
+```
+6. POSTMARK: a round semi-transparent cancellation postmark at the lower
+   right, overlapping ONLY the artwork's lower-right corner and the paper
+   just below it — it must NOT touch any lettering. A fine circle, the name
+   "<postmark_name>" in small capitals, three wavy cancellation
+   lines, and the date "<postmark_date>".
+```
+
+**【STRICT 段 · 叠字补强】**（追加在整条提示词**末尾**）
+
+```
+STRICT: the right margin carries TWO separate lines — "<engraver>" ends within
+the top quarter; "<side_right>" occupies only the middle half. Shrink both to
+cap-height 1.6 percent of the image height. Visible blank paper must remain
+between them and between every other pair of lines.
+```
+
+### A/B 串角色表（「禁止自造词」的客观判据）
+
+提示词里每个引号串必须逐字来自下表：
 
 | 类 | 字段 | 规则 |
 |---|---|---|
 | **A 固定串** | `side_left` `engraver` `postmark_name` `postmark_date` `year` | 模板自带虚构专名（LITO 系列、`ENGRAVED BY A. MOREL`、`14 - IX - 2026`）**视为已授权**：随主题原样用，不随景色改写、不改动拼写；日期间隔点一律连字符 `-`（`·` 会变方框） |
 | **B 专名位** | `title` `series` `value` `side_right` `eggs`（3 条） | 随景色重写，换景只动这一类；重写后同样加引号锁死 |
 
-主题 JSON 字段 = `key / name / title / series / year / value / side_left /
-side_right / engraver / postmark_name / postmark_date / eggs / egg_note / ink`。
-自定义景色 = 仿照任一 JSON 只换 B 串，A 串不动。
+**多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先拼成
+一张（贴图/画图软件手动拼合即可；有 Python 环境可用可选脚本
+`scripts/compose_sources.py 图1 图2 …`）；风格参考写成文字写进提示词，
+不找第二张风格图。
 
-**多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先
-`python scripts/compose_sources.py 图1 图2 …` 拼成一张；风格参考写成文字
-写进提示词，不找第二张风格图。
+### 质检与修正（目检为主）
 
-**质检与修正**：`python scripts/qc_stamp.py 成片.png --bands <目录>` 出可复现
-PASS/FAIL（尺寸 ±5% / 纸边上下 ≥10% 硬·左右 ≥8% / 五区占用 / 右侧两段间隔
-≥5%H / 居中 ≤2–3% / 齿孔行波动 ≥18 / 纸纹高频 std ≥6 / 齿孔带入侵 ≤2%）；
-`--bands` 导出 2× 字带供**拼写逐字人工核对**（拼写没有像素判据）。
-修正走 SKILL.md「失败修正决策树」：局部修复优先，重出后强制全量质检。
-叠字补强可用 `--strict`（等价于在提示词末尾追加）：
+按 SKILL.md「质量门」清单逐项目检：尺寸 ±5% / 纸边上下 ≥10% 硬·左右 ≥8% /
+五区占用 / 右侧两段间隔 ≥5%H / 居中 ≤2–3% / 齿孔行波动 ≥18 / 纸纹高频 std ≥6 /
+齿孔带入侵 ≤2%；**拼写没有目测捷径**——放大 2× 逐字人工核对（可截图字带）。
+有 Python 环境时，可选脚本 `scripts/qc_stamp.py 成片.png --bands <目录>`
+出同一套判据的可复现 PASS/FAIL 并导出 2× 字带。
+修正走 SKILL.md「失败修正决策树」：局部修复优先（末尾追加 STRICT 段重出），
+重出后强制全量目检。
 
-```
-STRICT: the right margin carries TWO separate lines — "ENGRAVED BY A. MOREL"
-ends within the top quarter; "IMPRESSIONIST - POST-IMPRESSIONIST" occupies only
-the middle half. Shrink both to cap-height 1.6 percent of the image height.
-Visible blank paper must remain between them and between every other pair of
-lines.
-```
+> **可选脚本工具箱**（不装也能走完主产线）：
+> `fill_prompt.py` = 怕手误/批量出票时替代手工替换（与上表同一模板同一 JSON，
+> 逻辑同源不会漂移）；`compose_sources.py` = 多图拼合；`qc_stamp.py` =
+> 可复现质检；`stamp_kit.py` = 像素级本地精排。
 
 ---
 
@@ -435,8 +515,8 @@ genuinely TINY and subtle, discoverable only on close inspection.
 
 ### 换主题：彩蛋对照表
 
-> 9 套内置主题的彩蛋已写进 `themes/*.json` 的 `eggs` 字段，
-> `fill_prompt.py --theme <键>` 自动带入——只有**自定义景色**才需要
+> 9 套内置主题的彩蛋已写进 `themes/*.json` 的 `eggs` 字段，替换
+> `{{EGG_BLOCK}}` 占位符时自动带入——只有**自定义景色**才需要
 > 从下表挑选后写进自己的 JSON。
 
 换景色时把三条替换掉，**主题与彩蛋要对应**：

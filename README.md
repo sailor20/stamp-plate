@@ -8,23 +8,25 @@
 ## 快速开始（三步）
 
 ```bash
-# 1) 编译整条提示词：模板唯一真源 references/stage2_template.txt + 主题 JSON
-python scripts/fill_prompt.py --theme coastal --out prompt.txt
+# 1) 组装整条提示词（零 Python）：模板唯一真源 references/stage2_template.txt
+#    + 主题参数预设 themes/*.json → 按替换表机械替换 11 个占位符
+#    （替换表与分段文本预设全文见 references/prompts.md 阶段 2）
 #    主题键：coastal / hilltown / avenue / meadow / snow / lake / desert /
 #            garden / coastal_cn（自定义景仿照 themes/*.json 写一个）
-#    --photo 照片输入 ｜ --no-postmark 新票 ｜ --strict 防叠字补强
+#    照片输入 → 保真段用 P 版 ｜ 新票 → 删邮戳段 ｜ 叠字 → 末尾追加 STRICT 段
 
 # 2) 喂给图生图模型：只喂这一张参考图、n=1、size 1536x1024
-#    （喂两张会稳定 upstream_error；多图先 compose_sources.py 拼成一张）
+#    （喂两张会稳定 upstream_error；多图先手动拼合成一张）
 
-# 3) 可复现质检：算法化质量门 + 导出 2× 字带人工核对拼写
-python scripts/qc_stamp.py stamp.png --bands bands/
+# 3) 按质量门清单目检：五区文字零重叠 / 拼写放大 2× 逐字核对 / 齿孔 /
+#    纸边 / 景物保真（判据见 SKILL.md「质量门」）
 ```
 
 ## 工作原理（一条提示词一次成型）
 
 整枚邮票——纸、齿孔、针脚框、**全部排版文字、邮戳**——由**一条完整提示词**直接生成，
-python 只负责编译提示词与质检，不参与出图。提示词按五段式拼装
+**零 Python**：纯提示词 + 参数预设（`themes/*.json`），`scripts/` 下脚本全部可选。
+提示词按五段式拼装
 （模板见 `references/stage2_template.txt`，用法见 `references/prompts.md` 阶段 2）：
 
 1. **保真** — `KEEP THE ARTWORK pixel for pixel`：景物 / 布片 / 线头一个像素都不动
@@ -95,10 +97,10 @@ python scripts/stamp_kit.py --src your-stamp.png --out matrix.png --sheet
 stamp-plate/
 ├── SKILL.md                     # 完整技能定义：路由 / 工作流 / 五区版式规格 / 质量门 / 失败修正决策树
 ├── themes/                      # 主题库（9 套 JSON：8 类景色 + 中文面值版）
-├── scripts/
-│   ├── fill_prompt.py           # ★主产线：stage2 模板 + 主题 JSON → 整条提示词
+├── scripts/                     # 可选工具箱（主产线零 Python，一个都不用）
+│   ├── fill_prompt.py           # 批量/怕手误时替代手工替换（模板 + JSON → 整条提示词）
 │   ├── compose_sources.py       # 多图预合成一张（横向 / 纵向 / 2×2）
-│   ├── qc_stamp.py              # 一次成型成片的可复现质检（算法化质量门）
+│   ├── qc_stamp.py              # 可复现质检（质量门判据算法化）
 │   └── stamp_kit.py             # 可选本地精排（Pillow + numpy）
 ├── references/
 │   ├── prompts.md               # 提示词模板库（★2 用法与判据 / 基础 / 边框支线 / 无字源票 / 彩蛋）
@@ -120,8 +122,8 @@ stamp-plate/
 
 ## 环境
 
-主产线只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入单张参考图、
-1536×1024、n=1）。辅助脚本与可选本地精排：Python 3.10+，依赖 Pillow、numpy。
+主产线零依赖零 Python：只需任意图生图模型（WorkBuddy 中为 image2 MCP：输入
+单张参考图、1536×1024、n=1）。可选脚本工具箱：Python 3.10+，依赖 Pillow、numpy。
 本地精排字体缺失时**显式报错**并给出三平台安装指引（绝不静默降级成位图字体）。
 
 ---
