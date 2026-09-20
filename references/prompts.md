@@ -2,14 +2,110 @@
 
 出图阶段一次只喂**一张**参考图。喂两张（内容 + 风格）会稳定返回 `upstream_error`。
 
-**模板索引**：阶段 1 基础版式 → 1b 边缘收拾 + 纸纹 → 1c / 1c-2 刺绣边框支线
-（含遮罩收边）→ 1d 边框精化遮罩 → **1e ★基准版式（虚线针脚框，默认走这条）**
-→ 3 排版参考 → 3b 主题彩蛋。
+**模板索引**：**阶段 2 ★一次成型整票（主产线，默认走这条）** → 3b 主题彩蛋 →
+1 基础版式 → 1b 边缘收拾 + 纸纹 → 1c / 1c-2 刺绣边框支线（含遮罩收边）→
+1d 边框精化遮罩 → 1e 无字源票（供附录本地精排）。
 
-**每个出图 prompt 都按四段式拼装**（对应 SKILL.md「决策清单 / Prompt 结构」）：
-① 源图保真（景物不动）② 邮票方向（纸 / 齿孔 / 倾斜投影 / 纸边宽度）
-③ 材质 / 图形 / 字体（纸纹 / 针脚框 / 彩蛋 / 边缘收拾）④ 禁止项
-（COMPLETELY BLANK + AVOID）。下面各阶段模板就是这四段的预制件，按版式取用组合。
+**每个出图 prompt 按五段式拼装**（对应 SKILL.md「决策清单 / Prompt 结构」）：
+① 源图保真 ② 邮票方向（纸 / 齿孔 / 倾斜投影 / 纸边宽度）③ 材质 / 图形
+（纸纹 / 针脚框 / 彩蛋）④ **排版规格（五区文字，逐区位置+限长+字号）**
+⑤ 禁止项。各阶段模板即五段的预制件，按版式取用组合。
+
+---
+
+## 阶段 2 · 一次成型整票（★主产线：纯提示词，不调 python）
+
+一条提示词直接生成完整邮票：纸、齿孔、针脚框、全部排版文字、邮戳。
+调用 `image2 edit_image`：只喂用户这一张参考图、`n=1`、`size 1536x1024`。
+
+**使用前替换三处**：①引号内文字（换主题时全部重写并加引号）②彩蛋三条
+（3b 对照表）③邮戳（用户要新票就删第 6 段）。
+
+```
+Turn the artwork in this image into ONE REALISTIC COLLECTOR POSTAGE STAMP
+lying flat on a warm grey tabletop, viewed from directly above, the stamp
+sheet filling most of the frame.
+
+1. KEEP THE ARTWORK — CRITICAL: do not move, redraw or restyle the landscape,
+   the cloth patches or the threads. Copy the artwork pixel for pixel into the
+   centre of the stamp. The stamp is only the paper and lettering around it.
+
+2. THE STAMP SHEET: warm ivory-cream laid paper, matte, slightly fibrous,
+   gently aged. Blank paper margins of about 12 percent of the image height at
+   TOP and BOTTOM and 9 percent at LEFT and RIGHT between the artwork and the
+   perforations. Around all four sides cut a row of PERFORATION HOLES — small,
+   round, evenly spaced, punched clean through the paper, each hole showing the
+   grey tabletop through it, with a tiny inner shadow and a faintly fuzzy
+   raised paper rim; a few holes slightly irregular or partially torn at the
+   corners. The stamp lies with a gentle 1.5-degree tilt and casts a soft
+   shadow on the tabletop.
+
+3. EDGE THE ARTWORK with a SIMPLE DASHED RUNNING-STITCH FRAME set directly
+   against the painting edge — one rectangle of small, slightly irregular dark
+   running stitches, like basting threads. NO wide linen border band, NO corner
+   ornaments, NO floral embroidery, NO added trim of any kind.
+
+4. TYPOGRAPHY — FIVE SEPARATE ZONES. Every line of type sits inside its own
+   zone; the zones never touch each other; NO two lines of text may overlap,
+   collide or enter another zone. All type is printed in ONE muted ink (soft
+   charcoal-sepia, around RGB 92,80,68), letterpress-flat and slightly uneven,
+   in the traditional dignified style of mid-century engraved stamps — a fine
+   old-style SERIF in capitals with generous letter-spacing for the title, and
+   a small condensed sans-serif in small capitals for secondary lines.
+
+   · TOP ZONE — the top paper margin, full width, horizontally centred: the
+     title "THE BLUE BAY", spaced serif capitals, cap-height about 3.5 percent
+     of the image height.
+   · BOTTOM ZONE — the bottom paper margin, ONE single horizontally centred
+     line with even gaps between the three items: the issuing line
+     "POSTA - COASTAL SERIES" (small sans capitals), then the value "60¢"
+     (about 1.4 times larger than the issuing line), then the year "2026"
+     (small).
+   · LEFT ZONE — the left paper margin: a tiny stitched X-shaped logo in the
+     upper quarter; below it "LANDSCAPE ISSUE - TEXTILE STUDY" reading
+     bottom-to-top, vertically centred and limited to the middle half of the
+     margin height, small sans capitals.
+   · RIGHT ZONE — the right paper margin, TWO separate sub-zones: in the upper
+     quarter only, the engraver signature "ENGRAVED BY A. MOREL" reading
+     top-to-bottom in a small hand-written script; in the middle half only,
+     "IMPRESSIONIST - POST-IMPRESSIONIST" reading top-to-bottom, small sans
+     capitals. A clear gap of at least 5 percent of the image height separates
+     the two; neither line reaches the other's zone, and neither touches the
+     artwork or the perforations.
+   · Keep all lettering small and quiet — printed into the stamp as part of
+     its design, never added afterwards.
+
+5. HIDDEN DETAILS: add ONLY three tiny hidden details worked in the same
+   fabric-and-thread technique as the artwork, each no bigger than two or
+   three stitches across: a tiny sailing boat on the open water; a small shell
+   hidden in the vegetation at lower right; three or four very faint tiny
+   footprints on the sandy patch at lower left. Genuinely tiny, discoverable
+   only on close inspection.
+
+6. POSTMARK: a round semi-transparent cancellation postmark at the lower
+   right, overlapping ONLY the artwork's lower-right corner and the paper just
+   below it — it must NOT touch any lettering. A fine circle, the name "LITO
+   COSTIERA" in small capitals, three wavy cancellation lines, and the date
+   "14 · IX · 2026".
+
+7. AVOID: overlapping or colliding text; letters entering another zone, the
+   artwork or the perforations; invented words, misspellings, random numbers;
+   a second ink colour; drop shadows on text; glowing or embossed text; bold
+   heavy type; postal markings other than the stated postmark; grey smudge
+   dots instead of real perforation holes; changing, redrawing or restyling
+   the artwork; hard black shadows.
+```
+
+**质检与修正**：放大四条文字带逐字核对拼写 + 五区间隔；翻车点补强见
+SKILL.md「决策清单 → 失败修正」。叠字补强示例（追加到原提示词末尾重试一轮）：
+
+```
+STRICT: the right margin carries TWO separate lines — "ENGRAVED BY A. MOREL"
+ends within the top quarter; "IMPRESSIONIST - POST-IMPRESSIONIST" occupies only
+the middle half. Shrink both to cap-height 1.6 percent of the image height.
+Visible blank paper must remain between them and between every other pair of
+lines.
+```
 
 ---
 
@@ -282,11 +378,11 @@ AVOID: touching the artwork, the perforated edge, or any other margin.
 
 ---
 
-## 阶段 1e · 基准版式：虚线针脚框（★最终样式）
+## 阶段 1e · 无字源票：虚线针脚框（供附录本地精排）
 
-**这是 skill 的默认最终样式**（成片见 `examples/final-style-reference.png`）：
-画面直接贴一圈深色虚线跑针框，**无亚麻边框带、无角饰**，纸边干净。
-首次出图 / 换景色**优先用这一版式**。
+出一张**纸面完全空白**的邮票底票（虚线针脚框 + 齿孔 + 纸边，无任何文字），
+专供 SKILL.md 附录的**可选本地精排**路线（`stamp_kit.py` 排版）。
+默认产线走阶段 2 一次成型，不必经过这一步。
 
 ```
 Put the whole fabric-collage artwork onto a REAL POSTAGE STAMP viewed flat from
