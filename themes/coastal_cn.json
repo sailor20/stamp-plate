@@ -4,7 +4,7 @@
   "title": "THE BLUE BAY",
   "series": "POSTA - COASTAL SERIES",
   "year": "2026",
-  "value": "60\u5206",
+  "values": ["20\u5206", "40\u5206", "60\u5206", "80\u5206", "1.20\u5143"],
   "side_left": "\u6d77\u5cb8\u7cfb\u5217 - \u7eba\u7ec7\u7814\u7a76",
   "side_right": "\u5370\u8c61\u6d3e - \u540e\u5370\u8c61\u6d3e",
   "engraver": "\u96d5\u523b A. MOREL",

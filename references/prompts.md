@@ -31,9 +31,10 @@
 
 `themes/*.json`（9 套，覆盖 3b 全部 8 类景色）：
 `coastal / hilltown / avenue / meadow / snow / lake / desert / garden`
-+ `coastal_cn`（中文面值版 "60分" + CJK 侧串）。
-字段 = `key / name / title / series / year / value / side_left / side_right /
-engraver / postmark_name / postmark_date / eggs(3 条英文) / egg_note / ink`。
++ `coastal_cn`（中文面值版，面值用「分 / 元」+ CJK 侧串）。
+字段 = `key / name / title / series / year / values(候选面值数组) / side_left /
+side_right / engraver / postmark_name / postmark_date / eggs(3 条英文) /
+egg_note / ink`。
 自定义景色 = 仿照任一 JSON 只换 B 串，A 串不动；eggs 必须给足 3 条。
 
 ### 第 2 步 · 占位符替换表
@@ -44,7 +45,8 @@ engraver / postmark_name / postmark_date / eggs(3 条英文) / egg_note / ink`�
 | `{{ARTWORK_NOUN}}` | `painting` 或 `photograph` | 与保真段同侧：F→painting，P→photograph |
 | `{{EGG_BLOCK}}` | 彩蛋段三态之一（预设全文见下） | fabric / photo_margin / photo_clean |
 | `{{POSTMARK_BLOCK}}` | 邮戳段（预设全文见下） | 信销样=替换；新票=替换成空（第 6 段整段消失） |
-| `{{TITLE}}` `{{SERIES}}` `{{VALUE}}` `{{YEAR}}` | JSON 同名字段 | B 串，加引号锁死 |
+| `{{TITLE}}` `{{SERIES}}` `{{YEAR}}` | JSON 同名字段 | B 串，加引号锁死 |
+| `{{VALUE}}` | JSON `values` 数组**随机取一** | B 串，加引号锁死；**每次出票换一个**，不沿用上一次的票 |
 | `{{SIDE_LEFT}}` `{{ENGRAVER}}` `{{SIDE_RIGHT}}` | JSON 同名字段 | A 串，不改写、不改拼写 |
 | `{{POSTMARK_NAME}}` `{{POSTMARK_DATE}}` | — | **模板正文没有这两个占位符**，只出现在邮戳段文本内部 |
 
@@ -124,7 +126,7 @@ between them and between every other pair of lines.
 | 类 | 字段 | 规则 |
 |---|---|---|
 | **A 固定串** | `side_left` `engraver` `postmark_name` `postmark_date` `year` | 模板自带虚构专名（LITO 系列、`ENGRAVED BY A. MOREL`、`14 - IX - 2026`）**视为已授权**：随主题原样用，不随景色改写、不改动拼写；日期间隔点一律连字符 `-`（`·` 会变方框） |
-| **B 专名位** | `title` `series` `value` `side_right` `eggs`（3 条） | 随景色重写，换景只动这一类；重写后同样加引号锁死 |
+| **B 专名位** | `title` `series` `values`(随机取一) `side_right` `eggs`（3 条） | 随景色重写，换景只动这一类；重写后同样加引号锁死 |
 
 **多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先用
 贴图/画图软件手动拼成一张再喂；风格参考写成文字写进提示词，
@@ -135,6 +137,8 @@ between them and between every other pair of lines.
 按 SKILL.md「质量门」清单逐项目检：尺寸 ±5% / 纸边上下 ≥10% 硬·左右 ≥8% /
 五区占用 / 右侧两段间隔 ≥5%H / 居中 ≤2–3% / 齿孔行波动 ≥18 / 纸纹高频 std ≥6 /
 齿孔带入侵 ≤2%；**拼写没有目测捷径**——放大 2× 逐字人工核对（可截图字带）。
+`¢` 常被模型渲染成**上标小 c**（读作 60 cents）——这是分单位的正常写法，
+不算拼写错误；判错标准是数字或单位缺失、错位、拼错（如 60 被画成 90）。
 修正走 SKILL.md「失败修正决策树」：局部修复优先（末尾追加 STRICT 段重出），
 重出后强制全量目检。
 
@@ -410,6 +414,9 @@ AVOID: touching the artwork, the perforated edge, or any other margin.
 ---
 
 ## 阶段 3 · 三段式字体排版
+
+> 下块为海岸主题的**写死示范**；实际组装走阶段 2 主产线——
+> 面值等 B 串一律来自主题 JSON（面值从 `values` 随机取一），不要照抄示范里的 "60"。
 
 ```
 ADD AUTHENTIC STAMP TYPOGRAPHY. This is now a real postage stamp design and it

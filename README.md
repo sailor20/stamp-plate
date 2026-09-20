@@ -50,7 +50,7 @@
 | 区域 | 内容 | 位置与限长 |
 |---|---|---|
 | 顶部 | 标题 `THE BLUE BAY` | 顶纸边水平居中，宽字距 |
-| 底部 | `POSTA - COASTAL SERIES` + `60¢` + `2026` | 同一行水平居中，面值放大约 1.4× |
+| 底部 | `POSTA - COASTAL SERIES` + 面值 + `2026` | 同一行水平居中，面值放大约 1.4×，每次出票从主题 `values` 数组随机取一 |
 | 左 | logo + `LANDSCAPE ISSUE - TEXTILE STUDY` | logo 占左上 1/4；文字限中部 50%，自下而上 |
 | 右·上段 | 署名 `ENGRAVED BY A. MOREL` | 仅右上 1/4 区 |
 | 右·中段 | `IMPRESSIONIST - POST-IMPRESSIONIST` | 仅中部 50% 区，**与上段间隔 ≥5% 画幅高** |
