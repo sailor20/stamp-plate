@@ -126,25 +126,17 @@ between them and between every other pair of lines.
 | **A 固定串** | `side_left` `engraver` `postmark_name` `postmark_date` `year` | 模板自带虚构专名（LITO 系列、`ENGRAVED BY A. MOREL`、`14 - IX - 2026`）**视为已授权**：随主题原样用，不随景色改写、不改动拼写；日期间隔点一律连字符 `-`（`·` 会变方框） |
 | **B 专名位** | `title` `series` `value` `side_right` `eggs`（3 条） | 随景色重写，换景只动这一类；重写后同样加引号锁死 |
 
-**多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先拼成
-一张（贴图/画图软件手动拼合即可；有 Python 环境可用可选脚本
-`scripts/compose_sources.py 图1 图2 …`）；风格参考写成文字写进提示词，
+**多图输入**：永远只喂一张（喂两张稳定 `upstream_error`）。多张素材先用
+贴图/画图软件手动拼成一张再喂；风格参考写成文字写进提示词，
 不找第二张风格图。
 
-### 质检与修正（目检为主）
+### 质检与修正（目检）
 
 按 SKILL.md「质量门」清单逐项目检：尺寸 ±5% / 纸边上下 ≥10% 硬·左右 ≥8% /
 五区占用 / 右侧两段间隔 ≥5%H / 居中 ≤2–3% / 齿孔行波动 ≥18 / 纸纹高频 std ≥6 /
 齿孔带入侵 ≤2%；**拼写没有目测捷径**——放大 2× 逐字人工核对（可截图字带）。
-有 Python 环境时，可选脚本 `scripts/qc_stamp.py 成片.png --bands <目录>`
-出同一套判据的可复现 PASS/FAIL 并导出 2× 字带。
 修正走 SKILL.md「失败修正决策树」：局部修复优先（末尾追加 STRICT 段重出），
 重出后强制全量目检。
-
-> **可选脚本工具箱**（不装也能走完主产线）：
-> `fill_prompt.py` = 怕手误/批量出票时替代手工替换（与上表同一模板同一 JSON，
-> 逻辑同源不会漂移）；`compose_sources.py` = 多图拼合；`qc_stamp.py` =
-> 可复现质检。
 
 ---
 
